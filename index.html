@@ -2,199 +2,296 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Spin Anak Ekstra TIK</title>
+<title>Spin Anak Ekstra TIK SDN Karangtejo</title>
+
 <style>
 body{
-  font-family:Arial, sans-serif;
-  background:#f2f8ff;
+  font-family: Arial, sans-serif;
+  background:#eef6ff;
   text-align:center;
 }
+
+h1{
+  color:#1a3c8b;
+}
+
 .container{
   display:flex;
   justify-content:center;
   gap:40px;
   margin-top:20px;
 }
-#wheel{
-  border:12px solid #333;
-  border-radius:50%;
+
+/* RODA */
+#wheelBox{
+  position:relative;
 }
-#pointer{
+
+#wheel{
+  width:350px;
+  height:350px;
+  border-radius:50%;
+  border:12px solid #333;
+  transition:transform 4s ease-out;
+}
+
+/* PANAH */
+#arrow{
   width:0;
   height:0;
   border-left:15px solid transparent;
   border-right:15px solid transparent;
-  border-bottom:25px solid red;
+  border-bottom:30px solid red;
   margin:auto;
+  margin-bottom:10px;
 }
+
+/* TOMBOL */
 button{
-  margin-top:15px;
-  padding:10px 25px;
+  margin-top:20px;
+  padding:12px 30px;
   font-size:18px;
-  background:#2196f3;
-  color:white;
   border:none;
   border-radius:8px;
+  background:#2196f3;
+  color:white;
   cursor:pointer;
 }
-button:hover{background:#1976d2;}
-.card{
+
+button:hover{
+  background:#1976d2;
+}
+
+/* HASIL */
+#hasilBox{
+  width:300px;
   background:white;
   padding:20px;
-  width:280px;
-  border-radius:12px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.2);
+  border-radius:15px;
+  box-shadow:0 0 10px rgba(0,0,0,0.2);
   text-align:left;
 }
-.card h3{text-align:center;}
-ul{padding-left:20px;}
+
+#hasilBox h3{
+  text-align:center;
+}
+
+#hasil{
+  margin-top:10px;
+}
 </style>
 </head>
+
 <body>
 
 <h1>🎯 Spin Anak Ekstra TIK SDN Karangtejo</h1>
-<div id="pointer"></div>
 
 <div class="container">
 
-<div>
-  <canvas id="wheel" width="350" height="350"></canvas><br>
-  <button onclick="spin()">SPIN</button>
+  <!-- SPIN -->
+  <div id="wheelBox">
+
+    <div id="arrow"></div>
+
+    <canvas id="wheel" width="350" height="350"></canvas>
+
+    <br>
+    <button onclick="spin()">SPIN</button>
+
+  </div>
+
+  <!-- HASIL -->
+  <div id="hasilBox">
+    <h3>Sudah Terpilih</h3>
+    <ul id="hasil">
+      <li>Belum ada</li>
+    </ul>
+  </div>
+
 </div>
 
-<div class="card">
-  <h3>Sudah Terpilih</h3>
-  <p><b>Kelompok:</b> <span id="kelompok">-</span></p>
-  <ul id="hasil">
-    <li>Belum ada</li>
-  </ul>
-</div>
-
-</div>
-
-<!-- Suara Undian -->
-<audio id="spinSound" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
-<audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+<!-- SUARA MENANG -->
+<audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-notification-2018.mp3"></audio>
 
 <script>
-// ================= DATA =================
-const kelompokNama = "Ekstra TIK Kelas 5";
 
-let names = [
-"ALI","MUAMMAR","NITA","ROHMAD","ZULVA","HISYAM","ALDEVARO",
-"ZUKY","KHANZA","GIBRAN","ZAHROTUL","AQILLA","EGA","SEFA",
-"PADINI","ARU","NAZWA","ARDAN","RIFQI","LEVINIA"
+/* =========================
+   DATA KELOMPOK
+========================= */
+
+const dataKelompok = [
+  {nama:"Kelompok 1", anak:["ALDEVARO","HISYAM","ZULVIA"]},
+  {nama:"Kelompok 2", anak:["ROHMAD","ALI","NITYA"]},
+  {nama:"Kelompok 3", anak:["MUAMMAR","ALZAM","ALESHA"]},
+  {nama:"Kelompok 4", anak:["WAFA","MALKAN","AZKIA"]},
+  {nama:"Kelompok 5", anak:["NAUVAL","RIZQI","LEVINA"]},
+  {nama:"Kelompok 6", anak:["RAFLI","NATHANAEL","RHADESKA"]},
+  {nama:"Kelompok 7", anak:["ARDAN","NIZAM","NAILA"]},
+  {nama:"Kelompok 8", anak:["ARU","PANDINI","SEFIA"]},
+  {nama:"Kelompok 9", anak:["EGA","AQILLA","ZAHROTUL"]},
+  {nama:"Kelompok 10", anak:["GIBRAN","KHANZA","ZUKY"]}
 ];
 
-let selected = [];
 
-// ================= SETUP =================
+/* =========================
+   GABUNG SEMUA ANAK
+========================= */
+
+let semuaAnak = [];
+
+dataKelompok.forEach(k=>{
+  k.anak.forEach(a=>{
+    semuaAnak.push({
+      nama:a,
+      kelompok:k.nama
+    });
+  });
+});
+
+
+/* =========================
+   CANVAS
+========================= */
+
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 const radius = canvas.width/2;
-let angle = 0;
+
+let rotation = 0;
 let spinning = false;
 
-const spinSound = document.getElementById("spinSound");
-const winSound = document.getElementById("winSound");
 
-// ================= DRAW =================
+/* =========================
+   WARNA
+========================= */
+
+function randomColor(){
+  return `hsl(${Math.random()*360},80%,70%)`;
+}
+
+
+/* =========================
+   GAMBAR RODA
+========================= */
+
 function drawWheel(){
+
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  const arc = 2*Math.PI/names.length;
 
-  names.forEach((name,i)=>{
-    const start = angle + i*arc;
+  const slice = 2*Math.PI/semuaAnak.length;
 
+  semuaAnak.forEach((data,i)=>{
+
+    // WARNA
     ctx.beginPath();
-    ctx.fillStyle = `hsl(${i*360/names.length},80%,70%)`;
     ctx.moveTo(radius,radius);
-    ctx.arc(radius,radius,radius,start,start+arc);
+    ctx.fillStyle = randomColor();
+    ctx.arc(radius,radius,radius,i*slice,(i+1)*slice);
     ctx.fill();
 
-    // Text
+    // TEXT
     ctx.save();
     ctx.translate(radius,radius);
-    ctx.rotate(start+arc/2);
+    ctx.rotate(i*slice + slice/2);
+
     ctx.textAlign="right";
-    ctx.fillStyle="#000";
-    ctx.font="14px Arial";
-    ctx.fillText(name, radius-10,5);
+    ctx.fillStyle="black";
+    ctx.font="bold 14px Arial";
+
+    ctx.fillText(data.nama, radius-15,5);
+
     ctx.restore();
+
   });
+
 }
 
 drawWheel();
 
-document.getElementById("kelompok").innerText = kelompokNama;
 
-// ================= SPIN =================
+/* =========================
+   SPIN
+========================= */
+
 function spin(){
-  if(spinning || names.length===0) return;
 
-  spinning = true;
-  spinSound.currentTime=0;
-  spinSound.play();
+  if(spinning) return;
 
-  let speed = Math.random()*0.3+0.25;
-  let decel = 0.995;
-
-  function rotate(){
-    speed *= decel;
-    angle += speed;
-    drawWheel();
-
-    if(speed>0.002){
-      requestAnimationFrame(rotate);
-    }else{
-      finishSpin();
-    }
-  }
-
-  rotate();
-}
-
-// ================= RESULT =================
-function finishSpin(){
-  spinSound.pause();
-  winSound.currentTime=0;
-  winSound.play();
-
-  const arc = 2*Math.PI/names.length;
-  let index = Math.floor((2*Math.PI-angle%(2*Math.PI))/arc)%names.length;
-
-  const winner = names[index];
-
-  selected.push(winner);
-  names.splice(index,1);
-
-  updateList();
-  drawWheel();
-
-  spinning=false;
-}
-
-// ================= UPDATE LIST =================
-function updateList(){
-  const ul = document.getElementById("hasil");
-  ul.innerHTML="";
-
-  if(selected.length===0){
-    ul.innerHTML="<li>Belum ada</li>";
+  if(semuaAnak.length==0){
+    alert("Semua anak sudah terpilih!");
     return;
   }
 
-  selected.forEach((n,i)=>{
-    const li=document.createElement("li");
-    li.innerText = (i+1)+". "+n;
-    ul.appendChild(li);
-  });
+  spinning = true;
+
+  const rand = Math.random()*360 + 720;
+
+  rotation += rand;
+
+  canvas.style.transform =
+    `rotate(${rotation}deg)`;
+
+
+  setTimeout(pilihHasil,4000);
+
 }
 
-// ================= RESET ON REFRESH =================
-window.onbeforeunload = function(){
-  return null;
+
+/* =========================
+   PILIH HASIL
+========================= */
+
+function pilihHasil(){
+
+  const slice = 360/semuaAnak.length;
+
+  let deg = rotation % 360;
+
+  let index = Math.floor(
+    (360-deg)/slice
+  ) % semuaAnak.length;
+
+
+  const terpilih = semuaAnak[index];
+
+  // SUARA
+  document.getElementById("winSound").play();
+
+  // TAMPILKAN
+  tampilkanHasil(terpilih);
+
+  // HAPUS
+  semuaAnak.splice(index,1);
+
+  // REDRAW
+  drawWheel();
+
+  spinning=false;
+
 }
+
+
+/* =========================
+   HASIL
+========================= */
+
+function tampilkanHasil(data){
+
+  const list = document.getElementById("hasil");
+
+  if(list.innerText=="Belum ada"){
+    list.innerHTML="";
+  }
+
+  const li = document.createElement("li");
+
+  li.innerHTML =
+    `<b>${data.kelompok}</b> - ${data.nama}`;
+
+  list.appendChild(li);
+
+}
+
 </script>
 
 </body>
