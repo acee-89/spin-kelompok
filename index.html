@@ -218,7 +218,8 @@ function spin(){
   }
 
   let sound = document.getElementById("sound");
-  sound.play();
+sound.currentTime = 0;
+sound.play();
 
   let putar = 360*5 + Math.random()*360;
 
