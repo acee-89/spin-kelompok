@@ -2,37 +2,24 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Spin Anak Ekstra TIK SDN Karangtejo</title>
-
+<title>Spin Anak Ekstra TIK</title>
 <style>
-
 body{
   font-family:Arial, sans-serif;
-  background:#eef6ff;
+  background:#f2f8ff;
   text-align:center;
-  padding:20px;
 }
-
-h1{color:#1f3c88;}
-
 .container{
   display:flex;
   justify-content:center;
   gap:40px;
   margin-top:20px;
 }
-
-/* RODA */
 #wheel{
-  width:300px;
-  height:300px;
-  border-radius:50%;
   border:12px solid #333;
-  margin:auto;
+  border-radius:50%;
 }
-
-/* PANAH */
-#arrow{
+#pointer{
   width:0;
   height:0;
   border-left:15px solid transparent;
@@ -40,244 +27,174 @@ h1{color:#1f3c88;}
   border-bottom:25px solid red;
   margin:auto;
 }
-
-/* TOMBOL */
 button{
   margin-top:15px;
-  padding:12px 25px;
-  font-size:16px;
+  padding:10px 25px;
+  font-size:18px;
   background:#2196f3;
   color:white;
   border:none;
   border-radius:8px;
   cursor:pointer;
 }
-
-button:hover{
-  background:#1976d2;
-}
-
-/* LIST */
-.list{
-  width:320px;
+button:hover{background:#1976d2;}
+.card{
   background:white;
-  padding:15px;
+  padding:20px;
+  width:280px;
   border-radius:12px;
-  box-shadow:0 0 6px rgba(0,0,0,.2);
+  box-shadow:0 2px 8px rgba(0,0,0,0.2);
   text-align:left;
 }
-
-#result{
-  margin-top:10px;
-  font-weight:bold;
-  color:#e91e63;
-}
-
+.card h3{text-align:center;}
+ul{padding-left:20px;}
 </style>
 </head>
-
 <body>
 
 <h1>🎯 Spin Anak Ekstra TIK SDN Karangtejo</h1>
-
-<div id="arrow"></div>
+<div id="pointer"></div>
 
 <div class="container">
 
-<!-- SPIN -->
 <div>
-
-  <div id="wheel"></div>
-
+  <canvas id="wheel" width="350" height="350"></canvas><br>
   <button onclick="spin()">SPIN</button>
+</div>
 
-  <div id="result"></div>
+<div class="card">
+  <h3>Sudah Terpilih</h3>
+  <p><b>Kelompok:</b> <span id="kelompok">-</span></p>
+  <ul id="hasil">
+    <li>Belum ada</li>
+  </ul>
+</div>
 
 </div>
 
-<!-- LIST -->
-<div class="list" id="listArea">
-<h3>Sudah Terpilih</h3>
-<p>Belum ada</p>
-</div>
-
-</div>
-
-<!-- SUARA HALUS -->
-<audio id="winSound" preload="auto">
-<source src="https://www.soundjay.com/buttons/sounds/button-09.mp3" type="audio/mpeg">
-</audio>
+<!-- Suara Undian -->
+<audio id="spinSound" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+<audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
 
 <script>
+// ================= DATA =================
+const kelompokNama = "Ekstra TIK Kelas 5";
 
-/* DATA */
-const kelompok = [
-
-{nama:"Kelompok 1", anak:["ALDEVARO","HISYAM","ZULVIA"]},
-{nama:"Kelompok 2", anak:["ROHMAD","ALI","NITYA"]},
-{nama:"Kelompok 3", anak:["MUAMMAR","ALZAM","ALESHA"]},
-{nama:"Kelompok 4", anak:["WAFA","MALKAN","AZKIA"]},
-{nama:"Kelompok 5", anak:["NAUVAL","RIZQI","LEVINA"]},
-{nama:"Kelompok 6", anak:["RAFLI","NATHANAEL","RHADESKA"]},
-{nama:"Kelompok 7", anak:["ARDAN","NIZAM","NAILA"]},
-{nama:"Kelompok 8", anak:["ARU","PANDINI","SEFIA"]},
-{nama:"Kelompok 9", anak:["EGA","AQILLA","ZAHROTUL"]},
-{nama:"Kelompok 10", anak:["GIBRAN","KHANZA","ZUKY"]}
-
+let names = [
+"ALI","MUAMMAR","NITA","ROHMAD","ZULVA","HISYAM","ALDEVARO",
+"ZUKY","KHANZA","GIBRAN","ZAHROTUL","AQILLA","EGA","SEFA",
+"PADINI","ARU","NAZWA","ARDAN","RIFQI","LEVINIA"
 ];
 
+let selected = [];
 
-/* BUAT DAFTAR */
-let daftar=[];
+// ================= SETUP =================
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+const radius = canvas.width/2;
+let angle = 0;
+let spinning = false;
 
-kelompok.forEach(k=>{
-  k.anak.forEach(a=>{
-    daftar.push({kelompok:k.nama,nama:a});
+const spinSound = document.getElementById("spinSound");
+const winSound = document.getElementById("winSound");
+
+// ================= DRAW =================
+function drawWheel(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const arc = 2*Math.PI/names.length;
+
+  names.forEach((name,i)=>{
+    const start = angle + i*arc;
+
+    ctx.beginPath();
+    ctx.fillStyle = `hsl(${i*360/names.length},80%,70%)`;
+    ctx.moveTo(radius,radius);
+    ctx.arc(radius,radius,radius,start,start+arc);
+    ctx.fill();
+
+    // Text
+    ctx.save();
+    ctx.translate(radius,radius);
+    ctx.rotate(start+arc/2);
+    ctx.textAlign="right";
+    ctx.fillStyle="#000";
+    ctx.font="14px Arial";
+    ctx.fillText(name, radius-10,5);
+    ctx.restore();
   });
-});
-
-let sisa=[...daftar];
-let keluar=[];
-let rotasi=0;
-
-const colors=[
-"#ff7675","#74b9ff","#55efc4","#ffeaa7",
-"#fd79a8","#a29bfe","#fab1a0","#81ecec"
-];
-
-
-/* BUAT RODA */
-function buatRoda(){
-
-  let step=360/sisa.length;
-  let bg="";
-
-  sisa.forEach((d,i)=>{
-    bg+=`${colors[i%colors.length]} ${i*step}% ${(i+1)*step}%,`;
-  });
-
-  let wheel=document.getElementById("wheel");
-
-  wheel.style.background=
-  "conic-gradient("+bg.slice(0,-1)+")";
-
-  wheel.innerHTML="";
-
-  sisa.forEach((d,i)=>{
-
-    let a=step*i+step/2;
-
-    let div=document.createElement("div");
-
-    div.style.position="absolute";
-    div.style.width="100%";
-    div.style.height="100%";
-    div.style.transform=`rotate(${a}deg)`;
-
-    div.innerHTML=`
-    <span style="
-    position:absolute;
-    left:60%;
-    top:50%;
-    font-size:11px;
-    font-weight:bold;">
-    ${d.nama}
-    </span>`;
-
-    wheel.appendChild(div);
-
-  });
-
 }
 
-buatRoda();
+drawWheel();
 
+document.getElementById("kelompok").innerText = kelompokNama;
 
-/* SPIN */
+// ================= SPIN =================
 function spin(){
+  if(spinning || names.length===0) return;
 
-  if(sisa.length==0){
-    alert("Semua sudah terpilih!");
+  spinning = true;
+  spinSound.currentTime=0;
+  spinSound.play();
+
+  let speed = Math.random()*0.3+0.25;
+  let decel = 0.995;
+
+  function rotate(){
+    speed *= decel;
+    angle += speed;
+    drawWheel();
+
+    if(speed>0.002){
+      requestAnimationFrame(rotate);
+    }else{
+      finishSpin();
+    }
+  }
+
+  rotate();
+}
+
+// ================= RESULT =================
+function finishSpin(){
+  spinSound.pause();
+  winSound.currentTime=0;
+  winSound.play();
+
+  const arc = 2*Math.PI/names.length;
+  let index = Math.floor((2*Math.PI-angle%(2*Math.PI))/arc)%names.length;
+
+  const winner = names[index];
+
+  selected.push(winner);
+  names.splice(index,1);
+
+  updateList();
+  drawWheel();
+
+  spinning=false;
+}
+
+// ================= UPDATE LIST =================
+function updateList(){
+  const ul = document.getElementById("hasil");
+  ul.innerHTML="";
+
+  if(selected.length===0){
+    ul.innerHTML="<li>Belum ada</li>";
     return;
   }
 
-  let putar=360*5+Math.random()*360;
-
-  rotasi+=putar;
-
-  document.getElementById("wheel").style.transition=
-  "transform 3s ease-out";
-
-  document.getElementById("wheel").style.transform=
-  `rotate(${rotasi}deg)`;
-
-  setTimeout(pilih,3000);
-
-}
-
-
-/* PILIH */
-function pilih(){
-
-  let deg=rotasi%360;
-
-  let step=360/sisa.length;
-
-  let i=
-  Math.floor((360-deg)/step)%sisa.length;
-
-  let data=sisa[i];
-
-  // mainkan suara
-  let sound=document.getElementById("winSound");
-  sound.currentTime=0;
-  sound.play();
-
-  keluar.push(data);
-  sisa.splice(i,1);
-
-  document.getElementById("result").innerText=
-  "🎉 "+data.kelompok+" - "+data.nama;
-
-  tampilList();
-  buatRoda();
-
-}
-
-
-/* LIST */
-function tampilList(){
-
-  let area=document.getElementById("listArea");
-
-  let grup={};
-
-  keluar.forEach(d=>{
-
-    if(!grup[d.kelompok])grup[d.kelompok]=[];
-
-    grup[d.kelompok].push(d.nama);
-
+  selected.forEach((n,i)=>{
+    const li=document.createElement("li");
+    li.innerText = (i+1)+". "+n;
+    ul.appendChild(li);
   });
-
-  let html="<h3>Sudah Terpilih</h3>";
-
-  for(let k in grup){
-
-    html+="<b>"+k+"</b><ul>";
-
-    grup[k].forEach(n=>{
-      html+="<li>"+n+"</li>";
-    });
-
-    html+="</ul>";
-
-  }
-
-  area.innerHTML=html;
-
 }
 
+// ================= RESET ON REFRESH =================
+window.onbeforeunload = function(){
+  return null;
+}
 </script>
 
 </body>
