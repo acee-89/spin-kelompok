@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Spin Kelompok Kelas 5</title>
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#f0f8ff;
+  text-align:center;
+  padding:20px;
+}
+
+h1{
+  color:#2c3e50;
+}
+
+#wheel{
+  width:250px;
+  height:250px;
+  border:10px solid #333;
+  border-radius:50%;
+  margin:20px auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  background:white;
+  transition: transform 3s ease-out;
+}
+
+button{
+  padding:12px 25px;
+  font-size:18px;
+  background:#3498db;
+  color:white;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#2980b9;
+}
+
+#result{
+  margin-top:20px;
+  font-size:20px;
+  font-weight:bold;
+  color:#e74c3c;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎯 Spin Kelompok Kelas 5</h1>
+
+<div id="wheel">PUTAR</div>
+
+<button onclick="spin()">SPIN</button>
+
+<div id="result"></div>
+
+<script>
+
+// ================= DATA KELOMPOK =================
+
+const groups = {
+
+  "Kelompok 1": [
+    "ALDEVARO RAFIF FAREZI",
+    "HISYAM AKMA HUSNI",
+    "ZULVIA SARI"
+  ],
+
+  "Kelompok 2": [
+    "ROHMAD HIDAYAT TULLOH",
+    "MUHAMMAD ALI WAFA",
+    "NITYA AIYRA FARADINA"
+  ],
+
+  "Kelompok 3": [
+    "MUAMMAR RASYIQ AL AHSAN",
+    "MUHAMMAD ALZAM KHAFIDH",
+    "ALESHA NOVARIA PUTRI"
+  ],
+
+  "Kelompok 4": [
+    "MUHAMMAD MUHIBUDDIN WAFA",
+    "MUHAMMAD MALKAN ALKAYYIS",
+    "AZKIA FITHROTUL AZIZAH"
+  ],
+
+  "Kelompok 5": [
+    "NAUVAL NAZHIRUL ARDHANI",
+    "MUHAMMAD RIZQI ADITYA",
+    "LEVINA PUTRI HARTANTO"
+  ],
+
+  "Kelompok 6": [
+    "RAFLI RAMADHAN",
+    "NATHANAEL ANGGARA",
+    "RHADESKA SHINAR MUFLIKHAH"
+  ],
+
+  "Kelompok 7": [
+    "ARDAN FAEYZA ADYATAMA",
+    "NIZAM MUWAFFA ALFARIZQI",
+    "NAILA ISTNA SA'ADAH"
+  ],
+
+  "Kelompok 8": [
+    "ARU DAMAR DAVIAN PUTRA",
+    "PANDINI RASYIQUL RAJENDRA",
+    "SEFIA LATIF"
+  ],
+
+  "Kelompok 9": [
+    "EGA HAZZA PRATAMA PUTRA",
+    "AQILLA MUFIA FAUZANA",
+    "ZAHROTUL 'ULYA"
+  ],
+
+  "Kelompok 10": [
+    "GIBRAN AUFA ATMAJA",
+    "KHANZA CALLISTA SHAQUEENA ARSY",
+    "ZUKY QAILA AZZAHRAH SUKAMTO"
+  ]
+
+};
+
+// ================= VARIABEL =================
+
+let available = [];   // daftar yang belum keluar
+let wheel = document.getElementById("wheel");
+let result = document.getElementById("result");
+
+// Gabungkan semua siswa ke 1 list
+for(let group in groups){
+  groups[group].forEach(name=>{
+    available.push({
+      group: group,
+      name: name
+    });
+  });
+}
+
+// ================= FUNGSI SPIN =================
+
+function spin(){
+
+  if(available.length === 0){
+    result.innerHTML = "✅ Semua siswa sudah keluar!";
+    return;
+  }
+
+  let index = Math.floor(Math.random() * available.length);
+
+  let selected = available[index];
+
+  let degree = 2000 + Math.random() * 2000;
+
+  wheel.style.transform = "rotate(" + degree + "deg)";
+
+  setTimeout(()=>{
+
+    wheel.innerText = selected.name;
+
+    result.innerHTML =
+      "🏫 " + selected.group +
+      "<br>🎉 " + selected.name;
+
+    // Hapus supaya tidak muncul lagi
+    available.splice(index,1);
+
+  },3000);
+
+}
+
+</script>
+
+</body>
+</html>
