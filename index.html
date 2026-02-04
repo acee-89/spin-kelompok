@@ -2,9 +2,10 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Spin Ekstrakurikuler TIK SDN Karangtejo</title>
+<title>Spin Kelompok Ekstra TIK SDN Karangtejo</title>
 
 <style>
+
 body{
   font-family: Arial, sans-serif;
   background:#f0f8ff;
@@ -16,167 +17,212 @@ h1{
   color:#2c3e50;
 }
 
+.container{
+  display:flex;
+  justify-content:center;
+  gap:40px;
+  margin-top:30px;
+}
+
+/* AREA SPIN */
+.spin-area{
+  width:300px;
+}
+
 #wheel{
   width:250px;
   height:250px;
   border:10px solid #333;
   border-radius:50%;
-  margin:20px auto;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:20px;
-  background:white;
-  transition: transform 3s ease-out;
+  margin:auto;
+  background:conic-gradient(
+    #ff7675 0% 10%,
+    #74b9ff 10% 20%,
+    #55efc4 20% 30%,
+    #ffeaa7 30% 40%,
+    #fd79a8 40% 50%,
+    #81ecec 50% 60%,
+    #fab1a0 60% 70%,
+    #a29bfe 70% 80%,
+    #fdcb6e 80% 90%,
+    #00cec9 90% 100%
+  );
+  transition:transform 4s ease-out;
 }
 
 button{
-  padding:12px 25px;
-  font-size:18px;
-  background:#3498db;
+  margin-top:20px;
+  padding:10px 25px;
+  font-size:16px;
+  background:#0984e3;
   color:white;
   border:none;
-  border-radius:8px;
+  border-radius:5px;
   cursor:pointer;
 }
 
 button:hover{
-  background:#2980b9;
+  background:#74b9ff;
 }
 
 #result{
-  margin-top:20px;
-  font-size:20px;
+  font-size:18px;
+  margin-top:15px;
   font-weight:bold;
-  color:#e74c3c;
 }
+
+/* AREA DATA */
+.list-area{
+  width:320px;
+  background:white;
+  padding:15px;
+  border-radius:10px;
+  box-shadow:0 0 5px #aaa;
+  text-align:left;
+}
+
+.list-area h3{
+  text-align:center;
+}
+
+ul{
+  padding-left:20px;
+}
+
 </style>
 </head>
 
 <body>
 
-<h1>🎯Spin Ekstrakurikuler TIK SDN Karangtejo</h1>
+<h1>🎯 Spin Kelompok Ekstra TIK SDN Karangtejo</h1>
 
-<div id="wheel">PUTAR</div>
+<div class="container">
 
-<button onclick="spin()">SPIN</button>
+<!-- SPIN -->
+<div class="spin-area">
 
-<div id="result"></div>
+  <div id="wheel"></div>
+
+  <button onclick="spin()">SPIN</button>
+
+  <p id="result">Silakan mulai spin 😊</p>
+
+</div>
+
+<!-- DATA -->
+<div class="list-area" id="listArea">
+
+<h3>Data Kelompok</h3>
+<p>Belum ada yang terpilih</p>
+
+</div>
+
+</div>
+
+
+<!-- SOUND -->
+<audio id="spinSound">
+  <source src="https://www.soundjay.com/mechanical/sounds/clock-ticking-1.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="winSound">
+  <source src="https://www.soundjay.com/button/sounds/button-09.mp3" type="audio/mpeg">
+</audio>
+
 
 <script>
 
-// ================= DATA KELOMPOK =================
-
-const groups = {
-
-  "Kelompok 1": [
-    "ALDEVARO RAFIF FAREZI",
-    "HISYAM AKMA HUSNI",
-    "ZULVIA SARI"
-  ],
-
-  "Kelompok 2": [
-    "ROHMAD HIDAYAT TULLOH",
-    "MUHAMMAD ALI WAFA",
-    "NITYA AIYRA FARADINA"
-  ],
-
-  "Kelompok 3": [
-    "MUAMMAR RASYIQ AL AHSAN",
-    "MUHAMMAD ALZAM KHAFIDH",
-    "ALESHA NOVARIA PUTRI"
-  ],
-
-  "Kelompok 4": [
-    "MUHAMMAD MUHIBUDDIN WAFA",
-    "MUHAMMAD MALKAN ALKAYYIS",
-    "AZKIA FITHROTUL AZIZAH"
-  ],
-
-  "Kelompok 5": [
-    "NAUVAL NAZHIRUL ARDHANI",
-    "MUHAMMAD RIZQI ADITYA",
-    "LEVINA PUTRI HARTANTO"
-  ],
-
-  "Kelompok 6": [
-    "RAFLI RAMADHAN",
-    "NATHANAEL ANGGARA",
-    "RHADESKA SHINAR MUFLIKHAH"
-  ],
-
-  "Kelompok 7": [
-    "ARDAN FAEYZA ADYATAMA",
-    "NIZAM MUWAFFA ALFARIZQI",
-    "NAILA ISTNA SA'ADAH"
-  ],
-
-  "Kelompok 8": [
-    "ARU DAMAR DAVIAN PUTRA",
-    "PANDINI RASYIQUL RAJENDRA",
-    "SEFIA LATIF"
-  ],
-
-  "Kelompok 9": [
-    "EGA HAZZA PRATAMA PUTRA",
-    "AQILLA MUFIA FAUZANA",
-    "ZAHROTUL 'ULYA"
-  ],
-
-  "Kelompok 10": [
-    "GIBRAN AUFA ATMAJA",
-    "KHANZA CALLISTA SHAQUEENA ARSY",
-    "ZUKY QAILA AZZAHRAH SUKAMTO"
-  ]
-
+// DATA KELOMPOK
+const kelompokData = {
+  "Kelompok 1":["ALDEVARO","HISYAM","ZULVIA"],
+  "Kelompok 2":["ROHMAD","ALI","NITYA"],
+  "Kelompok 3":["MUAMMAR","ALZAM","ALESHA"],
+  "Kelompok 4":["WAFA","MALKAN","AZKIA"],
+  "Kelompok 5":["NAUVAL","RIZQI","LEVINA"],
+  "Kelompok 6":["RAFLI","NATHANAEL","RHADESKA"],
+  "Kelompok 7":["ARDAN","NIZAM","NAILA"],
+  "Kelompok 8":["ARU","PANDINI","SEFIA"],
+  "Kelompok 9":["EGA","AQILLA","ZAHROTUL"],
+  "Kelompok 10":["GIBRAN","KHANZA","ZUKY"]
 };
 
-// ================= VARIABEL =================
+// DAFTAR KELOMPOK
+let daftarKelompok = Object.keys(kelompokData);
 
-let available = [];   // daftar yang belum keluar
-let wheel = document.getElementById("wheel");
-let result = document.getElementById("result");
+// YANG SUDAH KELUAR
+let sudahKeluar = [];
 
-// Gabungkan semua siswa ke 1 list
-for(let group in groups){
-  groups[group].forEach(name=>{
-    available.push({
-      group: group,
-      name: name
-    });
-  });
-}
-
-// ================= FUNGSI SPIN =================
-
+// SPIN
 function spin(){
 
-  if(available.length === 0){
-    result.innerHTML = "✅ Semua siswa sudah keluar!";
+  if(daftarKelompok.length === 0){
+    alert("Semua kelompok sudah keluar!\nRefresh untuk ulang.");
     return;
   }
 
-  let index = Math.floor(Math.random() * available.length);
+  const wheel = document.getElementById("wheel");
+  const spinSound = document.getElementById("spinSound");
+  const winSound = document.getElementById("winSound");
 
-  let selected = available[index];
+  spinSound.play();
 
-  let degree = 2000 + Math.random() * 2000;
+  let putar = 3600 + Math.random()*1000;
 
-  wheel.style.transform = "rotate(" + degree + "deg)";
+  wheel.style.transform = "rotate("+putar+"deg)";
 
   setTimeout(()=>{
 
-    wheel.innerText = selected.name;
+    spinSound.pause();
+    spinSound.currentTime = 0;
 
-    result.innerHTML =
-      "🏫 " + selected.group +
-      "<br>🎉 " + selected.name;
+    winSound.play();
 
-    // Hapus supaya tidak muncul lagi
-    available.splice(index,1);
+    let index = Math.floor(Math.random()*daftarKelompok.length);
 
-  },3000);
+    let hasil = daftarKelompok[index];
 
+    // HAPUS YANG SUDAH KELUAR
+    daftarKelompok.splice(index,1);
+
+    sudahKeluar.push(hasil);
+
+    tampilkanHasil(hasil);
+    tampilkanDaftar();
+
+  },4000);
+
+}
+
+
+// TAMPILKAN HASIL
+function tampilkanHasil(kelompok){
+
+  document.getElementById("result").innerText =
+  "🎉 Terpilih: "+kelompok;
+
+}
+
+
+// TAMPILKAN DATA
+function tampilkanDaftar(){
+
+  const area = document.getElementById("listArea");
+
+  let html = "<h3>Sudah Terpilih</h3>";
+
+  sudahKeluar.forEach(k=>{
+
+    html += "<b>"+k+"</b><ul>";
+
+    kelompokData[k].forEach(nama=>{
+      html += "<li>"+nama+"</li>";
+    });
+
+    html += "</ul>";
+
+  });
+
+  area.innerHTML = html;
 }
 
 </script>
