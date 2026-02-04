@@ -10,13 +10,10 @@ body{
   font-family:Arial, sans-serif;
   background:#eef6ff;
   text-align:center;
-  margin:0;
   padding:20px;
 }
 
-h1{
-  color:#1f3c88;
-}
+h1{color:#1f3c88;}
 
 .container{
   display:flex;
@@ -31,7 +28,6 @@ h1{
   height:300px;
   border-radius:50%;
   border:12px solid #333;
-  position:relative;
   margin:auto;
 }
 
@@ -45,14 +41,14 @@ h1{
   margin:auto;
 }
 
-/* BUTTON */
+/* TOMBOL */
 button{
   margin-top:15px;
   padding:12px 25px;
   font-size:16px;
-  border:none;
   background:#2196f3;
   color:white;
+  border:none;
   border-radius:8px;
   cursor:pointer;
 }
@@ -67,14 +63,13 @@ button:hover{
   background:white;
   padding:15px;
   border-radius:12px;
-  box-shadow:0 0 6px rgba(0,0,0,0.2);
+  box-shadow:0 0 6px rgba(0,0,0,.2);
   text-align:left;
 }
 
 #result{
   margin-top:10px;
   font-weight:bold;
-  font-size:18px;
   color:#e91e63;
 }
 
@@ -83,13 +78,13 @@ button:hover{
 
 <body>
 
-<h1>🎯 Spin Anak Ekstra TIK SDN Karangtejo</h1>
+<h1>🎯 Spin Kelompok Ekstra SDN Karangtejo</h1>
 
 <div id="arrow"></div>
 
 <div class="container">
 
-<!-- AREA SPIN -->
+<!-- SPIN -->
 <div>
 
   <div id="wheel"></div>
@@ -100,24 +95,22 @@ button:hover{
 
 </div>
 
-<!-- AREA LIST -->
+<!-- LIST -->
 <div class="list" id="listArea">
-
 <h3>Sudah Terpilih</h3>
 <p>Belum ada</p>
-
 </div>
 
 </div>
 
-<!-- SUARA -->
-<audio id="sound" preload="auto">
-  <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" type="audio/mpeg">
+<!-- SUARA HALUS -->
+<audio id="winSound" preload="auto">
+<source src="https://www.soundjay.com/buttons/sounds/button-09.mp3" type="audio/mpeg">
 </audio>
 
 <script>
 
-/* DATA KELOMPOK */
+/* DATA */
 const kelompok = [
 
 {nama:"Kelompok 1", anak:["ALDEVARO","HISYAM","ZULVIA"]},
@@ -134,24 +127,20 @@ const kelompok = [
 ];
 
 
-/* BUAT LIST SPIN */
-let daftar = [];
+/* BUAT DAFTAR */
+let daftar=[];
 
 kelompok.forEach(k=>{
   k.anak.forEach(a=>{
-    daftar.push({
-      kelompok:k.nama,
-      nama:a
-    });
+    daftar.push({kelompok:k.nama,nama:a});
   });
 });
 
-let sisa = [...daftar];
-let keluar = [];
+let sisa=[...daftar];
+let keluar=[];
+let rotasi=0;
 
-let rotasi = 0;
-
-const colors = [
+const colors=[
 "#ff7675","#74b9ff","#55efc4","#ffeaa7",
 "#fd79a8","#a29bfe","#fab1a0","#81ecec"
 ];
@@ -160,44 +149,39 @@ const colors = [
 /* BUAT RODA */
 function buatRoda(){
 
-  let step = 360 / sisa.length;
-  let bg = "";
+  let step=360/sisa.length;
+  let bg="";
 
   sisa.forEach((d,i)=>{
-
-    let c = colors[i % colors.length];
-
-    bg += `${c} ${i*step}% ${(i+1)*step}%,`;
-
+    bg+=`${colors[i%colors.length]} ${i*step}% ${(i+1)*step}%,`;
   });
 
-  let wheel = document.getElementById("wheel");
+  let wheel=document.getElementById("wheel");
 
-  wheel.style.background =
+  wheel.style.background=
   "conic-gradient("+bg.slice(0,-1)+")";
 
-  wheel.innerHTML = "";
+  wheel.innerHTML="";
 
   sisa.forEach((d,i)=>{
 
-    let angle = step*i + step/2;
+    let a=step*i+step/2;
 
-    let div = document.createElement("div");
+    let div=document.createElement("div");
 
     div.style.position="absolute";
     div.style.width="100%";
     div.style.height="100%";
-    div.style.transform=`rotate(${angle}deg)`;
+    div.style.transform=`rotate(${a}deg)`;
 
-    div.innerHTML = `
+    div.innerHTML=`
     <span style="
-      position:absolute;
-      left:60%;
-      top:50%;
-      transform:translateY(-50%);
-      font-size:11px;
-      font-weight:bold;">
-      ${d.nama}
+    position:absolute;
+    left:60%;
+    top:50%;
+    font-size:11px;
+    font-weight:bold;">
+    ${d.nama}
     </span>`;
 
     wheel.appendChild(div);
@@ -217,20 +201,15 @@ function spin(){
     return;
   }
 
-  let sound = document.getElementById("sound");
-sound.currentTime = 0;
-sound.play();
+  let putar=360*5+Math.random()*360;
 
-  let putar = 360*5 + Math.random()*360;
+  rotasi+=putar;
 
-  rotasi += putar;
-
-  document.getElementById("wheel").style.transition =
+  document.getElementById("wheel").style.transition=
   "transform 3s ease-out";
 
-  document.getElementById("wheel").style.transform =
+  document.getElementById("wheel").style.transform=
   `rotate(${rotasi}deg)`;
-
 
   setTimeout(pilih,3000);
 
@@ -240,41 +219,42 @@ sound.play();
 /* PILIH */
 function pilih(){
 
-  let deg = rotasi % 360;
+  let deg=rotasi%360;
 
-  let step = 360 / sisa.length;
+  let step=360/sisa.length;
 
-  let index =
-  Math.floor((360-deg)/step) % sisa.length;
+  let i=
+  Math.floor((360-deg)/step)%sisa.length;
 
-  let data = sisa[index];
+  let data=sisa[i];
+
+  // mainkan suara
+  let sound=document.getElementById("winSound");
+  sound.currentTime=0;
+  sound.play();
 
   keluar.push(data);
+  sisa.splice(i,1);
 
-  sisa.splice(index,1);
-
-  document.getElementById("result").innerText =
+  document.getElementById("result").innerText=
   "🎉 "+data.kelompok+" - "+data.nama;
 
-  tampilkanList();
-
+  tampilList();
   buatRoda();
 
 }
 
 
-/* TAMPILKAN LIST */
-function tampilkanList(){
+/* LIST */
+function tampilList(){
 
-  let area = document.getElementById("listArea");
+  let area=document.getElementById("listArea");
 
-  let grup = {};
+  let grup={};
 
   keluar.forEach(d=>{
 
-    if(!grup[d.kelompok]){
-      grup[d.kelompok]=[];
-    }
+    if(!grup[d.kelompok])grup[d.kelompok]=[];
 
     grup[d.kelompok].push(d.nama);
 
@@ -284,7 +264,7 @@ function tampilkanList(){
 
   for(let k in grup){
 
-    html += "<b>"+k+"</b><ul>";
+    html+="<b>"+k+"</b><ul>";
 
     grup[k].forEach(n=>{
       html+="<li>"+n+"</li>";
@@ -294,7 +274,7 @@ function tampilkanList(){
 
   }
 
-  area.innerHTML = html;
+  area.innerHTML=html;
 
 }
 
