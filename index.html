@@ -134,7 +134,7 @@ const dataKelompok = [
 
 
 /* =========================
-   GABUNG SEMUA ANAK
+   GABUNG DATA
 ========================= */
 
 let semuaAnak = [];
@@ -150,6 +150,13 @@ dataKelompok.forEach(k=>{
 
 
 /* =========================
+   SIMPAN HASIL PER KELOMPOK
+========================= */
+
+let hasilKelompok = {};
+
+
+/* =========================
    CANVAS
 ========================= */
 
@@ -159,6 +166,21 @@ const radius = canvas.width/2;
 
 let rotation = 0;
 let spinning = false;
+
+
+/* =========================
+   AUDIO FIX
+========================= */
+
+const winSound = document.getElementById("winSound");
+
+// unlock audio
+document.addEventListener("click",()=>{
+  winSound.play().then(()=>{
+    winSound.pause();
+    winSound.currentTime=0;
+  }).catch(()=>{});
+},{once:true});
 
 
 /* =========================
@@ -182,21 +204,19 @@ function drawWheel(){
 
   semuaAnak.forEach((data,i)=>{
 
-    // WARNA
     ctx.beginPath();
     ctx.moveTo(radius,radius);
     ctx.fillStyle = randomColor();
     ctx.arc(radius,radius,radius,i*slice,(i+1)*slice);
     ctx.fill();
 
-    // TEXT
     ctx.save();
     ctx.translate(radius,radius);
     ctx.rotate(i*slice + slice/2);
 
     ctx.textAlign="right";
     ctx.fillStyle="black";
-    ctx.font="bold 14px Arial";
+    ctx.font="bold 13px Arial";
 
     ctx.fillText(data.nama, radius-15,5);
 
@@ -255,10 +275,11 @@ function pilihHasil(){
   const terpilih = semuaAnak[index];
 
   // SUARA
-  document.getElementById("winSound").play();
+  winSound.currentTime=0;
+  winSound.play();
 
-  // TAMPILKAN
-  tampilkanHasil(terpilih);
+  // SIMPAN
+  simpanHasil(terpilih);
 
   // HAPUS
   semuaAnak.splice(index,1);
@@ -272,27 +293,56 @@ function pilihHasil(){
 
 
 /* =========================
-   HASIL
+   SIMPAN PER KELOMPOK
 ========================= */
 
-function tampilkanHasil(data){
+function simpanHasil(data){
 
-  const list = document.getElementById("hasil");
-
-  if(list.innerText=="Belum ada"){
-    list.innerHTML="";
+  if(!hasilKelompok[data.kelompok]){
+    hasilKelompok[data.kelompok]=[];
   }
 
-  const li = document.createElement("li");
+  hasilKelompok[data.kelompok].push(data.nama);
 
-  li.innerHTML =
-    `<b>${data.kelompok}</b> - ${data.nama}`;
+  tampilkanHasil();
 
-  list.appendChild(li);
+}
+
+
+/* =========================
+   TAMPILKAN HASIL
+========================= */
+
+function tampilkanHasil(){
+
+  const box = document.getElementById("hasil");
+
+  box.innerHTML="";
+
+  for(let k in hasilKelompok){
+
+    // Judul Kelompok
+    const judul = document.createElement("li");
+    judul.innerHTML = `<b>${k}</b>`;
+    box.appendChild(judul);
+
+    // Anak
+    hasilKelompok[k].forEach(a=>{
+
+      const li = document.createElement("li");
+      li.style.marginLeft="15px";
+      li.innerText="- "+a;
+
+      box.appendChild(li);
+
+    });
+
+  }
 
 }
 
 </script>
+
 
 </body>
 </html>
